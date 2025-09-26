@@ -1,0 +1,74 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_DSN=postgresql://astro:astro@postgres:5432/astro_db
+      - MONGO_DSN=mongodb://astro:astro@mongo:27017/astro_logs
+      - RABBITMQ_URL=amqp://astro:astro@rabbitmq:5672/astro
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - mongo
+      - rabbitmq
+      - redis
+
+  worker:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: celery -A app.workers.celery_app.celery_app worker --loglevel=info
+    environment:
+      - POSTGRES_DSN=postgresql://astro:astro@postgres:5432/astro_db
+      - MONGO_DSN=mongodb://astro:astro@mongo:27017/astro_logs
+      - RABBITMQ_URL=amqp://astro:astro@rabbitmq:5672/astro
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - rabbitmq
+      - redis
+
+  beat:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    command: celery -A data_pipeline.schedules.ingestion_schedule beat --loglevel=info
+    environment:
+      - RABBITMQ_URL=amqp://astro:astro@rabbitmq:5672/astro
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - rabbitmq
+      - redis
+
+  postgres:
+    image: postgis/postgis:15-3.3
+    environment:
+      POSTGRES_DB: astro_db
+      POSTGRES_USER: astro
+      POSTGRES_PASSWORD: astro
+    ports:
+      - "5432:5432"
+
+  mongo:
+    image: mongo:6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: astro
+      MONGO_INITDB_ROOT_PASSWORD: astro
+    ports:
+      - "27017:27017"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"

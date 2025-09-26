@@ -1,0 +1,25 @@
+{
+  "dashboard": {
+    "title": "Astronomical Detection Overview",
+    "panels": [
+      {
+        "type": "graph",
+        "title": "API Latency",
+        "targets": [
+          {
+            "expr": "sum(rate(api_latency_seconds_sum[5m])) / sum(rate(api_latency_seconds_count[5m]))"
+          }
+        ]
+      },
+      {
+        "type": "stat",
+        "title": "Anomaly Alerts per Hour",
+        "targets": [
+          {
+            "expr": "sum(rate(anomaly_alerts_total[1h]))"
+          }
+        ]
+      }
+    ]
+  }
+}
