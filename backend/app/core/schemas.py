@@ -58,3 +58,18 @@ class AnomalyDetectionInput(BaseModel):
 class AnomalyDetectionResult(BaseModel):
     anomaly_detected: bool
     points: List[Dict[str, Any]]
+
+
+# New schemas for mobile app API endpoints
+class Dataset(BaseModel):
+    id: str
+    name: str
+    source: str
+    description: str
+
+
+class Anomaly(BaseModel):
+    id: str
+    title: str
+    description: str
+    timestamp: str

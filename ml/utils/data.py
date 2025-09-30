@@ -9,10 +9,15 @@ import numpy as np
 from .images import load_fits_image, normalize_image
 
 
+
+from ml.data import DATASET_PATH
+
 class DatasetLoader:
     """Load batches of FITS images from local path patterns."""
 
-    def __init__(self, base_path: str | Path) -> None:
+    def __init__(self, base_path: str | Path = None) -> None:
+        if base_path is None:
+            base_path = DATASET_PATH
         self.base_path = Path(base_path)
 
     def list_files(self) -> List[Path]:

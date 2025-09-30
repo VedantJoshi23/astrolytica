@@ -1,7 +1,9 @@
 """Training entrypoint for the CNN detector."""
 from __future__ import annotations
 
+
 from pathlib import Path
+from ml.data import DATASET_PATH
 
 import numpy as np
 import torch
@@ -27,7 +29,9 @@ class FitsDataset(Dataset):
         return image, label
 
 
-def train_detector(data_path: Path, epochs: int = 5) -> AstronomicalCNN:
+def train_detector(data_path: Path = None, epochs: int = 5) -> AstronomicalCNN:
+    if data_path is None:
+        data_path = Path(DATASET_PATH)
     dataset = FitsDataset(data_path)
     dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
 

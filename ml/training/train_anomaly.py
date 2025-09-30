@@ -1,7 +1,9 @@
 """Training script for the sequence anomaly estimator."""
 from __future__ import annotations
 
+
 from pathlib import Path
+from ml.data import DATASET_PATH
 
 import numpy as np
 import torch
@@ -26,7 +28,9 @@ class TrajectoryDataset(Dataset):
         return trajectory, labels
 
 
-def train_anomaly(data_path: Path, epochs: int = 5) -> SequenceAnomalyEstimator:
+def train_anomaly(data_path: Path = None, epochs: int = 5) -> SequenceAnomalyEstimator:
+    if data_path is None:
+        data_path = Path(DATASET_PATH)
     dataset = TrajectoryDataset(data_path)
     dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
